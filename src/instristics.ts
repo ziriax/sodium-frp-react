@@ -1,5 +1,27 @@
 import * as React from 'react';
-import { lift } from "./lift"
+//import { Cell, Stream, Operational } from "sodiumjs"
+import { LiftedComponent, LiftedProps, LiftedComponentClass, lift } from "./lift"
+
+/*
+export class LiftedInstristic<P> extends LiftedComponent<P> {
+    render(): JSX.Element {
+        const state: any = this.state;
+        const props: any = this.props;
+        const type: string = props.__type__;
+        return React.createElement(type, state, state && state.children);
+    }
+} 
+
+function instristic<K extends keyof JSX.IntrinsicElements>(type: K): (props: LiftedProps<JSX.IntrinsicElements[K]>) => LiftedInstristic<K> {
+    return props => {
+        // HACK: Because Typescript generates a huge declaration file 
+        // when creating a new higher order class for each intristic,
+        // we stuff the intristic type into the props.
+        const newProps: any = {props, __type__: type};
+        return new LiftedInstristic<K>(newProps);
+    }
+ } 
+*/
 
 function instristic<K extends keyof JSX.IntrinsicElements>(type: K) {
     return lift<JSX.IntrinsicElements[K]>((p) => React.createElement(type, p));

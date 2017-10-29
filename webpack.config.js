@@ -8,7 +8,7 @@ var deleteEmpty = require('delete-empty');
 var PACKAGE_FILE = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
 var LIB_NAME = PACKAGE_FILE.name;
 
-/* helper function to get into build directory */
+/* helper function to get into dist directory */
 var libPath = function(name) {
   if ( undefined === name ) {
     return 'dist';

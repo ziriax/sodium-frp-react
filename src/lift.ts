@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { Cell, Stream, Operational } from "sodiumjs"
 
-type Unlisten = () => void;
+export type Unlisten = () => void;
 
-type Props<P> = {[K in keyof P]: P[K] | Cell<P[K]> };
+export type LiftedProps<P> = {[K in keyof P]: P[K] | Cell<P[K]> };
 
 export type Rendered = JSX.Element | JSX.Element[] | React.ReactPortal | string | number | null | false;
 
-abstract class Lifted<P> extends React.PureComponent<Props<P>, P> {
+export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps<P>, P> {
 
-    private unlisteners: {[key in keyof P]?: Unlisten} = {};
+    unlisteners: {[key in keyof P]?: Unlisten} = {};
 
     log(msg: string) {
         //console.info(msg, JSON.stringify(this.state));
@@ -25,13 +25,13 @@ abstract class Lifted<P> extends React.PureComponent<Props<P>, P> {
         this.relisten(null);
     }
 
-    componentWillReceiveProps(nextProps: Props<P>) {
+    componentWillReceiveProps(nextProps: LiftedProps<P>) {
         this.log("componentWillReceiveProps");
         this.relisten(nextProps);
     }
 
-    private relisten(newProps?: Props<P>) {
-        const oldProps: Props<P> = this.props;
+    relisten(newProps?: LiftedProps<P>) {
+        const oldProps: LiftedProps<P> = this.props;
 
         const unlisteners = this.unlisteners;
 
@@ -73,6 +73,10 @@ abstract class Lifted<P> extends React.PureComponent<Props<P>, P> {
     }
 };
 
+export interface LiftedComponentClass<P> {
+    new (props?: LiftedProps<P>, context?: any): LiftedComponent<P>;
+}
+
 /** 
  * Higher order component for that lifts a regular React component into a SodiumJS compatible component.
  * The lifted component will accept either the same prop as the original React component, or Sodium Cell of that prop.
@@ -80,8 +84,8 @@ abstract class Lifted<P> extends React.PureComponent<Props<P>, P> {
  * When the liften component is unmount, it stops listening.
  * @argument ChildClass  The React component class that will be lifted
  */
-export function lift<P>(ChildClass: React.ComponentClass<P> | React.StatelessComponent<P>) {
-    return <any>class extends Lifted<P> {
+export function lift<P>(ChildClass: React.ComponentClass<P> | React.StatelessComponent<P>): LiftedComponentClass<P> {
+    return class extends LiftedComponent<P> {
         public render() {
             return React.createElement(ChildClass, this.state, this.props.children);
         }
@@ -102,13 +106,13 @@ function renderUnorderedList(itemElements: JSX.Element[]): Rendered {
 export function list<P, T>(ItemClass: React.ComponentClass<T> | React.StatelessComponent<T>,
     getItems: (props: P) => ReadonlyArray<T>,
     getItemKey: (item: T, index: number) => string,
-    renderList?: (items: JSX.Element[]) => Rendered) {
+    renderList?: (items: JSX.Element[]) => Rendered): LiftedComponentClass<P> {
     const listRenderer = renderList || renderUnorderedList;
-    return <any>class extends Lifted<P> {
+    return class extends LiftedComponent<P> {
         public render() {
             const items = getItems(this.state);
             return listRenderer(items.map((item: any, index: number) =>
-                React.createElement(ItemClass, { ...item, key: getItemKey(item, index) }, item.children)));
+                React.createElement(ItemClass, { ...item, key: getItemKey(item, index) }, item && item.children)));
         }
     };
 }
@@ -116,8 +120,8 @@ export function list<P, T>(ItemClass: React.ComponentClass<T> | React.StatelessC
 /** 
  * Higher order component for switching to a single child based on sampled props
  */
-export function switcher<P>(getChild: (props: P) => JSX.Element) {
-    return <any>class extends Lifted<P> {
+export function switcher<P>(getChild: (props: P) => JSX.Element): LiftedComponentClass<P> {
+    return class extends LiftedComponent<P> {
         public render() {
             return getChild(this.state);
         }

@@ -1,5 +1,5 @@
 {
-  "name": "sodium-react-frp",
+  "name": "sodium-frp-react",
   "version": "0.1.0",
   "description": "Higher order components to easily use SodiumJS Functional Reactive Programming with Facebook React",
   "main": "dist/index.js",
@@ -32,10 +32,11 @@
   "homepage": "https://github.com/Ziriax/sodium-frp-react#readme",
   "dependencies": {
     "@types/react": "^16.0.18",
-    "react": "^16.0.0"
+    "react": "^16.0.0",
+    "sodiumjs": "^1.0.4",
+    "typescript-collections": "^1.2.5"
   },
   "devDependencies": {
-    "sodiumjs": "^1.0.4",
     "typescript": "^2.5.3"
   }
 }
