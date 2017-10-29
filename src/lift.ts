@@ -5,11 +5,59 @@ export type Unlisten = () => void;
 
 export type LiftedProps<P> = {[K in keyof P]: P[K] | Cell<P[K]> };
 
-export type Rendered = JSX.Element | JSX.Element[] | React.ReactPortal | string | number | null | false;
+export type Renderable = JSX.Element | JSX.Element[] | React.ReactPortal | string | number | null | false;
+
+export interface SamplerProps<T> {
+    /** The cell that must be sampled */
+    readonly cell: Cell<T>;
+
+    /** If no renderer is provided for the sampled value, we assume the value itself is renderable */
+    readonly render?: (value: T) => Renderable;
+}
+
+export class Sampler<T> extends React.PureComponent<SamplerProps<T>, { value: Renderable }> {
+
+    unlisten: Unlisten | null = null;
+
+    componentWillMount() {
+        this.relisten(this.props);
+    }
+
+    componentWillUnmount() {
+        this.relisten();
+    }
+
+    componentWillReceiveProps(nextProps: Readonly<SamplerProps<T>>) {
+        this.relisten(nextProps);
+    }
+
+    relisten(props?: Readonly<SamplerProps<T>>) {
+        if (this.unlisten) {
+            this.unlisten();
+            this.unlisten = null;
+        }
+
+        if (props) {
+            this.unlisten = props.cell.listen(value => this.setState({
+                value: this.props.render ? this.props.render(value) : value as any
+            }));
+        }
+    }
+
+    render(): Renderable {
+        const { value = null } = this.state;
+        return value;
+    }
+};
+
+/** Samples a single prop cell to a single state value */
+export function sample<T extends Renderable>(props: SamplerProps<T>): Sampler<T> {
+    return new Sampler<T>(props);
+}
 
 export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps<P>, P> {
 
-    unlisteners: {[key in keyof P]?: Unlisten} = {};
+    unlisteners: {[key in keyof P]?: Unlisten | null} = {};
 
     log(msg: string) {
         //console.info(msg, JSON.stringify(this.state));
@@ -22,7 +70,7 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
 
     componentWillUnmount() {
         this.log("componentWillUnmount");
-        this.relisten(null);
+        this.relisten();
     }
 
     componentWillReceiveProps(nextProps: LiftedProps<P>) {
@@ -44,7 +92,7 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
         }
 
         if (newProps) {
-            const state = {} as Pick<P, keyof P>;
+            const state: any = {};
 
             for (let key in newProps) {
                 if (newProps.hasOwnProperty(key)) {
@@ -58,12 +106,16 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
                     if (value instanceof Cell) {
                         // Don't listen twice to the same prop cell!
                         if (!unlisteners[key]) {
+                            this.log(`Started listening to ${key}`);
                             unlisteners[key] = value.listen(x => this.setState({ [key as any]: x }));
+                        } else {
+                            this.log(`Already listening to ${key}`);
                         }
                         continue;
                     }
 
                     // A constant value, just put in the state.
+                    this.log(`Constant value for ${key}`);
                     state[key] = value;
                 }
             }
@@ -74,7 +126,7 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
 };
 
 export interface LiftedComponentClass<P> {
-    new (props?: LiftedProps<P>, context?: any): LiftedComponent<P>;
+    new(props?: LiftedProps<P>, context?: any): LiftedComponent<P>;
 }
 
 /** 
@@ -87,12 +139,12 @@ export interface LiftedComponentClass<P> {
 export function lift<P>(ChildClass: React.ComponentClass<P> | React.StatelessComponent<P>): LiftedComponentClass<P> {
     return class extends LiftedComponent<P> {
         public render() {
-            return React.createElement(ChildClass, this.state, this.props.children);
+            return React.createElement(ChildClass, this.state);
         }
     };
 }
 
-function renderUnorderedList(itemElements: JSX.Element[]): Rendered {
+function renderUnorderedList(itemElements: JSX.Element[]): Renderable {
     return React.createElement("ul", { className: "list-group" }, itemElements);
 }
 
@@ -106,13 +158,13 @@ function renderUnorderedList(itemElements: JSX.Element[]): Rendered {
 export function list<P, T>(ItemClass: React.ComponentClass<T> | React.StatelessComponent<T>,
     getItems: (props: P) => ReadonlyArray<T>,
     getItemKey: (item: T, index: number) => string,
-    renderList?: (items: JSX.Element[]) => Rendered): LiftedComponentClass<P> {
+    renderList?: (items: JSX.Element[]) => Renderable): LiftedComponentClass<P> {
     const listRenderer = renderList || renderUnorderedList;
     return class extends LiftedComponent<P> {
         public render() {
             const items = getItems(this.state);
             return listRenderer(items.map((item: any, index: number) =>
-                React.createElement(ItemClass, { ...item, key: getItemKey(item, index) }, item && item.children)));
+                React.createElement(ItemClass, { ...item, key: getItemKey(item, index) })));
         }
     };
 }

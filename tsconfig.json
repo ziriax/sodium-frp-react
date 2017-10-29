@@ -4,7 +4,7 @@
     "lib": [
       "es6"
     ],
-    "module": "ES2015",
+    "module": "commonjs",
     "target": "es5",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -12,6 +12,9 @@
     "declaration": true,
     "outDir": "dist",
     "removeComments": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "typeRoots": [
       "node_modules/@types"
     ]
