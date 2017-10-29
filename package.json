@@ -1,0 +1,41 @@
+{
+  "name": "sodium-react-frp",
+  "version": "0.1.0",
+  "description": "Higher order components to easily use SodiumJS Functional Reactive Programming with Facebook React",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ziriax/sodium-frp-react.git"
+  },
+  "keywords": [
+    "FRP",
+    "sodium",
+    "sodiumjs",
+    "react",
+    "reactjs",
+    "facebook",
+    "reactive",
+    "functional",
+    "bridge",
+    "redux",
+    "flux"
+  ],
+  "author": "Peter Verswyvelen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ziriax/sodium-frp-react/issues"
+  },
+  "homepage": "https://github.com/Ziriax/sodium-frp-react#readme",
+  "dependencies": {
+    "@types/react": "^16.0.18",
+    "react": "^16.0.0"
+  },
+  "devDependencies": {
+    "sodiumjs": "^1.0.4",
+    "typescript": "^2.5.3"
+  }
+}
