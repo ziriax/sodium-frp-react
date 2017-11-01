@@ -1,11 +1,12 @@
 {
   "name": "sodium-frp-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Higher order components to easily use SodiumJS Functional Reactive Programming with Facebook React",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest --watchAll"
   },
   "repository": {
     "type": "git",
@@ -33,10 +34,26 @@
   "dependencies": {
     "@types/react": "^16.0.18",
     "react": "^16.0.0",
-    "sodiumjs": "^1.0.4",
-    "typescript-collections": "^1.2.5"
+    "typescript-collections": "^1.2.5",
+    "sodiumjs": "^1.0.4"
   },
   "devDependencies": {
+    "@types/jest": "^21.1.5",
+    "jest": "^21.2.1",
+    "ts-jest": "^21.1.4",
     "typescript": "^2.5.3"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ]
   }
 }
