@@ -1,5 +1,4 @@
 import * as React from 'react';
-//import { Cell, Stream, Operational } from "sodiumjs"
 import { LiftedComponent, LiftedProps, LiftedComponentClass, lift } from "./lift"
 
 function instristic<K extends keyof JSX.IntrinsicElements>(type: K) {

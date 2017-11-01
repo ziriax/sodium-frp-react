@@ -1,15 +1,22 @@
 import * as React from 'react';
-import { Cell, Stream, Operational } from "sodiumjs"
 
 export type Unlisten = () => void;
 
-export type LiftedProps<P> = {[K in keyof P]: P[K] | Cell<P[K]> };
+export interface Producer<T = any> {
+    listen(action: (value: T) => void): Unlisten;
+}
+
+export function isProducer(p: any): p is Producer {
+    return typeof p === "object" && typeof p.listen === "function";
+}
+
+export type LiftedProps<P> = {[K in keyof P]: P[K] | Producer<P[K]> };
 
 export type Renderable = JSX.Element | JSX.Element[] | React.ReactPortal | string | number | null | false;
 
 export interface SamplerProps<T> {
     /** The cell that must be sampled */
-    readonly cell: Cell<T>;
+    readonly cell: Producer<T>;
 
     /** If no renderer is provided for the sampled value, we assume the value itself is renderable */
     readonly render?: (value: T) => Renderable;
@@ -98,12 +105,7 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
                 if (newProps.hasOwnProperty(key)) {
                     const value = newProps[key];
 
-                    if (value instanceof Stream) {
-                        // Don't listen to streams, these are passed down for event handling.
-                        continue;
-                    }
-
-                    if (value instanceof Cell) {
+                    if (isProducer(value)) {
                         // Don't listen twice to the same prop cell!
                         if (!unlisteners[key]) {
                             this.log(`Started listening to ${key}`);
