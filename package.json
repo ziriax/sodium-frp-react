@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -v",
     "test": "jest --watchAll"
   },
   "repository": {
@@ -41,7 +41,7 @@
     "@types/jest": "^21.1.5",
     "jest": "^21.2.1",
     "ts-jest": "^21.1.4",
-    "typescript": "^2.5.3"
+    "typescript": "^2.6.1"
   },
   "jest": {
     "transform": {

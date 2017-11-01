@@ -24,7 +24,7 @@ export const emptyKeys = keysOf({});
 
 /** Split a stream of a single record into a single record of streams  */
 export function splitStream<T>(keys: KeysOf<T>, streamOfRecord: StreamOfRecord<T>): RecordOfStream<T> {
-    return keys.reduce((recordOfStream: any, key: any) => ({
+    return keys.reduce((recordOfStream: any, key) => ({
         ...recordOfStream,
         [key]: streamOfRecord.map(r => r[key])
     }), {});
@@ -35,7 +35,7 @@ export function splitCell<T>(cellOfRecord: CellOfRecord<T>): RecordOfCell<T> {
     const initial = cellOfRecord.sample();
     const keys = keysOf(initial);
     const recordOfStream = splitStream<T>(keys, S.Operational.updates(cellOfRecord));
-    return keys.reduce((recordOfCell: any, key: any) => ({
+    return keys.reduce((recordOfCell: any, key) => ({
         ...recordOfCell,
         [key]: new S.Cell<any>(initial[key], recordOfStream[key])
     }), {});
@@ -43,10 +43,11 @@ export function splitCell<T>(cellOfRecord: CellOfRecord<T>): RecordOfCell<T> {
 
 /** Merge a single record of cells into a cell of a single record */
 export function mergeCells<T>(recordOfCell: RecordOfCell<T>): CellOfRecord<T> {
-    return keysOf(recordOfCell).reduce((cellOfRecord: any, key: any) => {
+    return keysOf(recordOfCell).reduce((cellOfRecord: any, key) => {
         return cellOfRecord.lift(recordOfCell[key], (field: any, value: any) => ({
             ...field,
             [key]: value
         }));
     }, new S.Cell<any>({}));
 }
+
