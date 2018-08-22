@@ -6,11 +6,11 @@ export interface Producer<T = any> {
     listen(action: (value: T) => void): Unlisten;
 }
 
-export function isProducer(p: any): p is Producer {
+export function isProducer<T>(p: any | Producer<T>): p is Producer<T> {
     return typeof p === "object" && typeof p.listen === "function";
 }
 
-export type LiftedProps<P> = {[K in keyof P]: P[K] | Producer<P[K]> };
+export type LiftedProps<P> = {readonly [K in keyof P]: P[K] | Producer<P[K]> };
 
 export type Renderable = JSX.Element | JSX.Element[] | React.ReactPortal | string | number | null | false;
 
@@ -109,7 +109,7 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
                         // Don't listen twice to the same prop cell!
                         if (!unlisteners[key]) {
                             this.log(`Started listening to ${key}`);
-                            unlisteners[key] = value.listen(x => this.setState({ [key as any]: x }));
+                            unlisteners[key] = value.listen(x => this.setState({ [key]: x } as any));
                         } else {
                             this.log(`Already listening to ${key}`);
                         }
@@ -128,7 +128,7 @@ export abstract class LiftedComponent<P> extends React.PureComponent<LiftedProps
 };
 
 export interface LiftedComponentClass<P> {
-    new(props?: LiftedProps<P>, context?: any): LiftedComponent<P>;
+    new(props: LiftedProps<P>, context?: any): LiftedComponent<P>;
 }
 
 /** 
