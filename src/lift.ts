@@ -12,7 +12,7 @@ export function isProducer<T>(p: any | Producer<T>): p is Producer<T> {
 
 export type LiftedProps<P> = {readonly [K in keyof P]: P[K] | Producer<P[K]> };
 
-export type Renderable = JSX.Element | JSX.Element[] | React.ReactPortal | string | number | null | false;
+export type Renderable = JSX.Element | null | false;
 
 export interface SamplerProps<T> {
     /** The cell that must be sampled */
@@ -58,7 +58,7 @@ export class Sampler<T> extends React.PureComponent<SamplerProps<T>, { value: Re
 };
 
 /** Samples a single prop cell to a single state value */
-export function sample<T extends Renderable>(props: SamplerProps<T>): Sampler<T> {
+export function sample<T>(props: SamplerProps<T>): Sampler<T> {
     return new Sampler<T>(props);
 }
 

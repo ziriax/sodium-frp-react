@@ -32,16 +32,16 @@
   },
   "homepage": "https://github.com/Ziriax/sodium-frp-react#readme",
   "dependencies": {
-    "@types/react": "^16.4.11",
     "hoek": "^4.2.1",
     "lodash": "^4.17.10",
     "react": "^16.4.2",
     "sodiumjs": "^1.1.3",
-    "sshpk": "^1.13.2",
+    "sshpk": "^1.14.2",
     "typescript-collections": "^1.3.2"
   },
   "devDependencies": {
     "@types/jest": "^21.1.10",
+    "@types/react": "^16.4.11",
     "jest": "^21.2.1",
     "ts-jest": "^21.2.4",
     "typescript": "^2.9.2"

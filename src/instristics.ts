@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LiftedComponent, LiftedProps, LiftedComponentClass, lift } from "./lift"
+import { lift } from "./lift"
 
 function instristic<K extends keyof JSX.IntrinsicElements>(type: K) {
     return lift<JSX.IntrinsicElements[K]>((p) => {
